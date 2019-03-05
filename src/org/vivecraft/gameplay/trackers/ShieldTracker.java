@@ -11,10 +11,12 @@ import org.vivecraft.utils.Vector3;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiWinGame;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemAir;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
@@ -125,13 +127,13 @@ private Random r = new Random();
 			}
 			
 			if(check == 1) {
-				if(isClick == true&&isAlready== false) {
+				if(isClick == true&&isAlready== false&& mc.currentScreen==null) {
 					shieldStart = Util.milliTime();
 					shieldUp = false;
 					InputSimulator.pressMouse(1);
 					isMain = true;
 					isAlready = true;
-				}else if(isClick==false && isAlready == true) {
+				}else if(isClick==false && isAlready == true|| isAlready == true && mc.currentScreen!=null) {
 					isMain = false;
 					InputSimulator.releaseMouse(1);
 					isAlready = false;
@@ -141,32 +143,27 @@ private Random r = new Random();
 					shieldUp = true;
 				}
 			}else if(check==2) {
-//				boolean checkMainEnum = false;
-//				System.out.println("Pos : " + (hmdPos.y - controllerPos.y));
-//				System.out.println("dotDelta : " +dotDelta );
-//				if(	mc.playerController.processRightClick(player, player.world,c==0?EnumHand.MAIN_HAND:EnumHand.OFF_HAND)==EnumActionResult.SUCCESS){
-//					
-//				}
 				ItemStack is = player.getHeldItem(EnumHand.MAIN_HAND);
 	        	Item item = null;
 				if(is!=null )item = is.getItem();
-
+//				System.out.println(is );
+//				System.out.println(item);
 	            boolean tool = false;
 	            boolean sword = false;
-
+	            
 	            if(item instanceof ItemSword){
 	            	sword = true; 	
 	            }else if (item instanceof ItemTool){
 	            	tool = true;
 	            }
-				if(isClick == true&&isAlready== false&&(sword==true||tool==true)) {
+				if(isClick == true&&isAlready== false&&(sword==true||tool==true||item instanceof ItemAir) && mc.currentScreen==null) {
 					shieldStart = Util.milliTime();
 					shieldUp = false;
 					InputSimulator.pressMouse(1);
 //					player.setItemInUseClient(player.getHeldItem(EnumHand.OFF_HAND));
 //					mc.playerController.processRightClick(player, player.world, hand);
 					isAlready = true;
-				}else if(isClick==false && isAlready == true) {
+				}else if((isClick==false && isAlready == true)|| isAlready == true && mc.currentScreen!=null) {
 					InputSimulator.releaseMouse(1);
 //					player.setItemInUseClient(ItemStack.EMPTY);
 					isAlready = false;
