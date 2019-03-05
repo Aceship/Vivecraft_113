@@ -278,7 +278,7 @@
      }
  
      /**
-@@ -371,185 +433,399 @@
+@@ -371,185 +433,413 @@
          RenderHelper.disableStandardItemLighting();
      }
  
@@ -307,24 +307,6 @@
 -            if (stack.isEmpty())
 -            {
 -                if (flag && !player.isInvisible())
--                {
--                    this.renderArmFirstPerson(equippedProgress, swingProgress, enumhandside);
--                }
--            }
--            else if (stack.getItem() instanceof ItemMap)
--            {
--                if (flag && this.itemStackOffHand.isEmpty())
--                {
--                    this.renderMapFirstPerson(pitch, equippedProgress, swingProgress);
--                }
--                else
--                {
--                    this.renderMapFirstPersonSide(equippedProgress, enumhandside, swingProgress, stack);
--                }
--            }
--            else
--            {
--                boolean flag1 = enumhandside == EnumHandSide.RIGHT;
 +    	boolean mainHand = hand == EnumHand.MAIN_HAND;
 +    	EnumHandSide enumhandside = mainHand ? player.getPrimaryHand() : player.getPrimaryHand().opposite();
 +    	equippedProgress = getEquipProgress(hand, partialTicks);
@@ -511,8 +493,143 @@
 +    			this.renderMapFirstPersonSide(equippedProgress, enumhandside, swingProgress, stack);
 +    			break;
 +    		case Shield:
- 
++
 +    			GlStateManager.scaled(1.2, 1.2, 1.2);
++//              Original Shield User
++//                if (player.isHandActive() && player.getItemInUseCount() > 0 && player.getActiveHand() == hand)
++//                {
++//	    			if(player.isActiveItemStackBlocking()){
++//	    				GlStateManager.rotatef(i*90.0F, 0.0F, 1.0F, 0.0F);  
++//	    			} else{
++//	    				GlStateManager.rotatef((1-equippedProgress)*i*90.0F, 0.0F, 1.0F, 0.0F);
++//	    			}
++//                }
++//    			GlStateManager.scaled(0.4, 0.4, 0.4);
++//    			GlStateManager.rotatef(i*90.0F, 0.0F, 1.0F, 0.0F);  
++//    			GlStateManager.translated(.5,0.5,.6);
++    			
++    			//Shield Hero stance
++    			if (player.isHandActive() && player.getItemInUseCount() > 0 && player.getActiveHand() == hand)
+                 {
+-                    this.renderArmFirstPerson(equippedProgress, swingProgress, enumhandside);
++	    			if(player.isActiveItemStackBlocking()){
++	    				GlStateManager.translatef(0f,0f,-0.02f);
++	    			} else{
++	    				GlStateManager.translatef(0f,0f,(1-equippedProgress)*-0.02f);
++	    			}
+                 }
+-            }
+-            else if (stack.getItem() instanceof ItemMap)
+-            {
+-                if (flag && this.itemStackOffHand.isEmpty())
+-                {
+-                    this.renderMapFirstPerson(pitch, equippedProgress, swingProgress);
+-                }
+-                else
+-                {
+-                    this.renderMapFirstPersonSide(equippedProgress, enumhandside, swingProgress, stack);
++    			GlStateManager.scaled(0.4, 0.4, 0.4);
++    			GlStateManager.rotatef(90.0F, 0F, 0.0F,1F); 
++    			GlStateManager.rotatef(90.0F, i*1F, 0.0F,0);  
++    			GlStateManager.translated(.5,0.5,.6);
++
++    			break;
++    		case Spear:
++    			   			
++				float prog = 0;
++         
++				if (player.isHandActive() && player.getItemInUseCount() > 0 && player.getActiveHand() == hand)
++				{
++					int j = EnchantmentHelper.getRiptideModifier(stack);
++					
++					if(j<=0 || (j>0 &&player.isWet())){
++						prog = (float)stack.getUseDuration() - ((float)this.mc.player.getItemInUseCount() - partialTicks + 1.0F);
++						if (prog > 10) { //charged    
++							prog = 10;
++							
++							if (j>0 && player.isWet()) {                
++								GlStateManager.rotatef((player.getItemInUseCount()*10*j) % 360 - partialTicks*10*j , 0.0F, 0.0F, 1.0F);      							
++							} 
++							
++							if(mc.frameIndex % 4 == 0) {
++								MCOpenVR.triggerHapticPulse(mainHand ? 0 : 1, 200);
++							}	   	
++							
++							long t = Util.milliTime() - mc.bowTracker.startDrawTime;
++							GlStateManager.translated(0.003*Math.sin(t),0, 0);  						
++						}
++					} 	
++				}
++                
++                if(player.isSpinAttacking()) {
++        			GlStateManager.translated(0 ,0, -0.15f);  						
+                 }
+-            }
+-            else
+-            {
+-                boolean flag1 = enumhandside == EnumHandSide.RIGHT;
+-
++        
++                GlStateManager.translatef(0.3f, -0.3f, -0.75f + prog /10 * (0.25f) );		
++				GlStateManager.scaled(0.6, 0.6, 0.6);	
++				GlStateManager.rotatef(90.0F, 0.0F, 1.0F, 0.0F);   
++				GlStateManager.rotatef(-90.0F, 0.0F, 0.0F, 1.0F);     
++				
++
++    			break;
++    		case Sword:
++    			if(vive){
++    				GlStateManager.translatef(0f, 0f, -0.2f);		
++    				GlStateManager.scaled(0.6, 0.6, 0.6);	
++    				GlStateManager.rotatef(-45F, 1.0F, 0.0F, 0.0F);
++    				GlStateManager.rotatef(90.0F, 0.0F, 1.0F, 0.0F);      							
++    			} else {
++    				GlStateManager.translatef(0f, 0.10f, -0.125f);		
++    				GlStateManager.scaled(0.6, 0.6, 0.6);	
++    				GlStateManager.rotatef(-45F + 39.4f, 1.0F, 0.0F, 0.0F);
++    				GlStateManager.rotatef(90.0F, 0.0F, 1.0F, 0.0F);  
++    			}
++    			break;
++    		case Tool:
++    			
++    			if(mc.climbTracker.isClaws(stack) && mc.climbTracker.isClimbeyClimb()){
++
++    				GlStateManager.scaled(0.3, 0.3, 0.3);
++    				GlStateManager.translatef(-.025f, .12f, .25f);
++    				GlStateManager.rotatef(90, 0, 0, 1);	
++
++    				if((mc.gameSettings.keyBindAttack.isKeyDown() && rightSide) ||
++    						((mc.climbTracker.isGrabbingLadder() || !mc.player.onGround) && mc.gameSettings.keyBindForward.isKeyDown() && !rightSide)) {
++    					GlStateManager.translatef(0f, 0f, -.2f);	
++    				}
++    			}
++
++    			if(vive){
++    				GlStateManager.translatef(0f, -.025f, -0.1f);		
++    				GlStateManager.scaled(0.6, 0.6, 0.6);	
++
++    				if(item instanceof ItemCarrotOnAStick || item instanceof ItemFishingRod) {}
++    				else
++    					GlStateManager.rotatef(180.0F, 0.0F, 0.0F, 1.0F);  
++
++    				GlStateManager.rotatef(-45F, 1.0F, 0.0F, 0.0F);
++    				GlStateManager.rotatef(90.0F, 0.0F, 1.0F, 0.0F);
++    			} else {
++    				GlStateManager.translatef(0f, 0.035f, -0.1f);		
++    				GlStateManager.scaled(0.6, 0.6, 0.6);	
++
++    				if(item instanceof ItemCarrotOnAStick || item instanceof ItemFishingRod) {
++    					GlStateManager.rotatef(39.4f, 1.0F, 0.0F, 0.0F);
++    				}
++    				else
++    					GlStateManager.rotatef(180.0F, 0.0F, 0.0F, 1.0F);  
++
++    				GlStateManager.rotatef(-45F - 39.4f, 1.0F, 0.0F, 0.0F);
++    				GlStateManager.rotatef(90.0F, 0.0F, 1.0F, 0.0F);
++    			}
++    			
++    			break;
++    		case Noms:
                  if (player.isHandActive() && player.getItemInUseCount() > 0 && player.getActiveHand() == hand)
                  {
 -                    int k = flag1 ? 1 : -1;
@@ -587,12 +704,7 @@
 -                            GlStateManager.scalef(1.0F, 1.0F, 1.0F + f2 * 0.2F);
 -                            GlStateManager.rotatef((float)k * 45.0F, 0.0F, -1.0F, 0.0F);
 -                    }
-+	    			if(player.isActiveItemStackBlocking()){
-+	    				GlStateManager.rotatef(i*90.0F, 0.0F, 1.0F, 0.0F);  
-+	    			} else{
-+	    				GlStateManager.rotatef((1-equippedProgress)*i*90.0F, 0.0F, 1.0F, 0.0F);
-+	    			}
-                 }
+-                }
 -                else if (player.isSpinAttacking())
 -                {
 -                    this.transformSideFirstPerson(enumhandside, equippedProgress);
@@ -600,106 +712,9 @@
 -                    GlStateManager.translatef((float)i * -0.4F, 0.8F, 0.3F);
 -                    GlStateManager.rotatef((float)i * 65.0F, 0.0F, 1.0F, 0.0F);
 -                    GlStateManager.rotatef((float)i * -85.0F, 0.0F, 0.0F, 1.0F);
-+
-+    			GlStateManager.scaled(0.4, 0.4, 0.4);
-+    			GlStateManager.rotatef(i*90.0F, 0.0F, 1.0F, 0.0F);  
-+    			GlStateManager.translated(.5,0.5,.6);
-+
-+    			break;
-+    		case Spear:
-+    			   			
-+				float prog = 0;
-+         
-+				if (player.isHandActive() && player.getItemInUseCount() > 0 && player.getActiveHand() == hand)
-+				{
-+					int j = EnchantmentHelper.getRiptideModifier(stack);
-+					
-+					if(j<=0 || (j>0 &&player.isWet())){
-+						prog = (float)stack.getUseDuration() - ((float)this.mc.player.getItemInUseCount() - partialTicks + 1.0F);
-+						if (prog > 10) { //charged    
-+							prog = 10;
-+							
-+							if (j>0 && player.isWet()) {                
-+								GlStateManager.rotatef((player.getItemInUseCount()*10*j) % 360 - partialTicks*10*j , 0.0F, 0.0F, 1.0F);      							
-+							} 
-+							
-+							if(mc.frameIndex % 4 == 0) {
-+								MCOpenVR.triggerHapticPulse(mainHand ? 0 : 1, 200);
-+							}	   	
-+							
-+							long t = Util.milliTime() - mc.bowTracker.startDrawTime;
-+							GlStateManager.translated(0.003*Math.sin(t),0, 0);  						
-+						}
-+					} 	
-+				}
-+                
-+                if(player.isSpinAttacking()) {
-+        			GlStateManager.translated(0 ,0, -0.15f);  						
-                 }
+-                }
 -                else
-+        
-+                GlStateManager.translatef(0.3f, -0.3f, -0.75f + prog /10 * (0.25f) );		
-+				GlStateManager.scaled(0.6, 0.6, 0.6);	
-+				GlStateManager.rotatef(90.0F, 0.0F, 1.0F, 0.0F);   
-+				GlStateManager.rotatef(-90.0F, 0.0F, 0.0F, 1.0F);     
-+				
-+
-+    			break;
-+    		case Sword:
-+    			if(vive){
-+    				GlStateManager.translatef(0f, 0f, -0.2f);		
-+    				GlStateManager.scaled(0.6, 0.6, 0.6);	
-+    				GlStateManager.rotatef(-45F, 1.0F, 0.0F, 0.0F);
-+    				GlStateManager.rotatef(90.0F, 0.0F, 1.0F, 0.0F);      							
-+    			} else {
-+    				GlStateManager.translatef(0f, 0.10f, -0.125f);		
-+    				GlStateManager.scaled(0.6, 0.6, 0.6);	
-+    				GlStateManager.rotatef(-45F + 39.4f, 1.0F, 0.0F, 0.0F);
-+    				GlStateManager.rotatef(90.0F, 0.0F, 1.0F, 0.0F);  
-+    			}
-+    			break;
-+    		case Tool:
-+    			
-+    			if(mc.climbTracker.isClaws(stack) && mc.climbTracker.isClimbeyClimb()){
-+
-+    				GlStateManager.scaled(0.3, 0.3, 0.3);
-+    				GlStateManager.translatef(-.025f, .12f, .25f);
-+    				GlStateManager.rotatef(90, 0, 0, 1);	
-+
-+    				if((mc.gameSettings.keyBindAttack.isKeyDown() && rightSide) ||
-+    						((mc.climbTracker.isGrabbingLadder() || !mc.player.onGround) && mc.gameSettings.keyBindForward.isKeyDown() && !rightSide)) {
-+    					GlStateManager.translatef(0f, 0f, -.2f);	
-+    				}
-+    			}
-+
-+    			if(vive){
-+    				GlStateManager.translatef(0f, -.025f, -0.1f);		
-+    				GlStateManager.scaled(0.6, 0.6, 0.6);	
-+
-+    				if(item instanceof ItemCarrotOnAStick || item instanceof ItemFishingRod) {}
-+    				else
-+    					GlStateManager.rotatef(180.0F, 0.0F, 0.0F, 1.0F);  
-+
-+    				GlStateManager.rotatef(-45F, 1.0F, 0.0F, 0.0F);
-+    				GlStateManager.rotatef(90.0F, 0.0F, 1.0F, 0.0F);
-+    			} else {
-+    				GlStateManager.translatef(0f, 0.035f, -0.1f);		
-+    				GlStateManager.scaled(0.6, 0.6, 0.6);	
-+
-+    				if(item instanceof ItemCarrotOnAStick || item instanceof ItemFishingRod) {
-+    					GlStateManager.rotatef(39.4f, 1.0F, 0.0F, 0.0F);
-+    				}
-+    				else
-+    					GlStateManager.rotatef(180.0F, 0.0F, 0.0F, 1.0F);  
-+
-+    				GlStateManager.rotatef(-45F - 39.4f, 1.0F, 0.0F, 0.0F);
-+    				GlStateManager.rotatef(90.0F, 0.0F, 1.0F, 0.0F);
-+    			}
-+    			
-+    			break;
-+    		case Noms:
-+                if (player.isHandActive() && player.getItemInUseCount() > 0 && player.getActiveHand() == hand)
-                 {
+-                {
 -                    float f6 = -0.4F * MathHelper.sin(MathHelper.sqrt(swingProgress) * (float)Math.PI);
 -                    float f = 0.2F * MathHelper.sin(MathHelper.sqrt(swingProgress) * ((float)Math.PI * 2F));
 -                    float f1 = -0.2F * MathHelper.sin(swingProgress * (float)Math.PI);
@@ -768,6 +783,13 @@
 -                double d2 = entityplayer.posZ + (double)(((float)((i >> 2) % 2) - 0.5F) * entityplayer.width * 0.8F);
 -                BlockPos blockpos1 = new BlockPos(d0, d1 + (double)entityplayer.getEyeHeight(), d2);
 -                IBlockState iblockstate1 = this.mc.world.getBlockState(blockpos1);
+-
+-                if (iblockstate1.causesSuffocation())
+-                {
+-                    iblockstate = iblockstate1;
+-                    blockpos = blockpos1;
+-                }
+-            }
 +        	TextureAtlasSprite tex = this.mc.getBlockRendererDispatcher().getBlockModelShapes().getTexture(iblockstate);
 +        	this.renderFaceInBlock();
 +        	mc.entityRenderer.inblock = true;
@@ -792,17 +814,10 @@
 +        	//                }
 +        	//            }
  
--                if (iblockstate1.causesSuffocation())
--                {
--                    iblockstate = iblockstate1;
--                    blockpos = blockpos1;
--                }
--            }
- 
 -            if (iblockstate.getRenderType() != EnumBlockRenderType.INVISIBLE)
 -            {
 -                Object object = Reflector.getFieldValue(Reflector.RenderBlockOverlayEvent_OverlayType_BLOCK);
--
+ 
 -                if (!Reflector.callBoolean(Reflector.ForgeEventFactory_renderBlockOverlay, this.mc.player, partialTicks, object, iblockstate, blockpos))
 -                {
 -                    this.renderSuffocationOverlay(this.mc.getBlockRendererDispatcher().getBlockModelShapes().getTexture(iblockstate));
@@ -826,7 +841,7 @@
                  this.renderFireInFirstPerson();
              }
          }
-@@ -631,13 +907,13 @@
+@@ -631,13 +921,13 @@
          Tessellator tessellator = Tessellator.getInstance();
          BufferBuilder bufferbuilder = tessellator.getBuffer();
          GlStateManager.color4f(1.0F, 1.0F, 1.0F, 0.9F);
@@ -843,7 +858,7 @@
          {
              GlStateManager.pushMatrix();
              TextureAtlasSprite textureatlassprite = this.mc.getTextureMap().getSprite(ModelBakery.LOCATION_FIRE_1);
-@@ -646,19 +922,20 @@
+@@ -646,19 +936,20 @@
              float f2 = textureatlassprite.getMaxU();
              float f3 = textureatlassprite.getMinV();
              float f4 = textureatlassprite.getMaxV();
@@ -875,7 +890,7 @@
              tessellator.draw();
              GlStateManager.popMatrix();
          }
-@@ -743,4 +1020,130 @@
+@@ -743,4 +1034,130 @@
              this.equippedProgressOffHand = 0.0F;
          }
      }

@@ -203,12 +203,12 @@ public class FakeBlockAccess implements IWorldReader {
 
 	@Override
 	public boolean canSeeSky(BlockPos pos) {
-		return true; // ¯\_(ツ)_/¯
+		return true; 
 	}
 
 	@Override
 	public int getHeight(Heightmap.Type heightmapType, int x, int z) {
-		return 0; // ¯\_(ツ)_/¯
+		return 0; 
 	}
 
 	@Nullable
